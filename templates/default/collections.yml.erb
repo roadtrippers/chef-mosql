@@ -1,0 +1,13 @@
+<%= @database %>:
+  <% @collections.each do |collection_name, collection_specs| %>
+  <%= collection_name %>:
+    :columns:
+      <% collection_specs[:columns].each do |col| %>
+      - <%= col.first[0] + (col.first[1] ? ": #{col.first[1]}" : ':' ) %>
+        <%= col[:source] ? ":source: #{col[:source]}" : '' %>
+        <%= col[:type] ? ":type: #{col[:type]}" : '' %> 
+      <% end %>
+    :meta:    
+      :table: <%= collection_specs[:meta][:table] %>
+      <%= collection_specs[:meta][:extra_props] ? ':extra_props: true' : '' %>
+  <% end %>
