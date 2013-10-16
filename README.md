@@ -1,15 +1,12 @@
-WIP
-===
-
-This is currently a WIP, should not be used for any production purposes.
-Issues should not be reported.
-
 mosql Cookbook
 ==============
 
 Bake mo' SQL into your NoSQL.
 
-Sets up and runs [MoSQL](http://github.com/stripe/mosql) on your server.
+Sets up and runs [MoSQL] on your server.
+
+![Chef MoSQL](http://files.roadtrippers.com/assets/chef_mosql.png)
+
 
 Requirements
 ------------
@@ -20,22 +17,59 @@ have been tested, but others may work as well.
 There is no hard dependency on which mongo/postgres recipes are used; however,
 mosql should be run thereafter.
 
+This recipe depends on the [runit] recipe to run mosql as a service.
+
 Attributes
 ----------
 
 #### mosql::default
 
-+ ```node['mosql']['collections_path']``` - the location that the
-  ```collections.yml``` should be read from (required) 
-+ ```node['mosql']['mongo'] - url to connect to mongo; can be prepended with
-  ```USERNAME@PASSWORD``` and postpended with options
-  + e.g. ```mongdb://$USER@$PASSWORD:$HOST/admin```
-  + default: nil; this uses the mosql defaults, which at last look, were
-    localhost with no authentication or options
-+ ```node['mosql']['sql']``` - url to connect to the postgres database
-  + e.g. ```postgres://sql-server/sql-db```
-  + default: nil; this uses the mosql default, which at last look, were
-    localhost with no authentication 
+##### `node['mosql']['mongo_database']` (required)
+
+The mongo database from which pull/copy from. 
+
+##### `node['mosql']['collections]` (required)
+
+The collections to be writen to the collections file.
+
+Structure should follow the same convension as the [mosql collections YAML],
+but in a ruby hash.  For example:
+
+```ruby
+node['mosql']['collections'] = {
+  "site_layouts"=> {
+    :columns=> [
+      {"mongo_id"=>nil, :source=>"_id", :type=>"TEXT"},
+      {"subdomain"=>"TEXT"},
+      {"page_title"=>"TEXT"},
+      {"top_border"=>"TEXT"},
+      {"created_at"=>"TIMESTAMP WITHOUT TIME ZONE"},
+      {"updated_at"=>"TIMESTAMP WITHOUT TIME ZONE"}
+    ],
+    :meta=>{:table=> "site_layouts"}
+  }
+}
+```
+
+##### `node['mosql']['collections_path']` (optional)
+
+The location that the ```collections.yml``` should be written to. The default
+location is `/usr/local/etc/mosql/collections.yml`).
+
+##### `node['mosql']['mongo_url']` (optional)
+
+The URL to connect to mongo; can be prepended with ```USERNAME@PASSWORD``` and
+postpended with options; e.g. ```mongdb://$USER@$PASSWORD:$HOST/admin```
+
+Defaults to `nil`; this uses the mosql defaults, which at last look, were
+localhost with no authentication or options.
+
+##### `node['mosql']['sql']` (optional)
+
+The URL to connect to the postgres database. E.g. ```postgres://sql-server/sql-db```
+
+Defaults to `nil`; this uses the mosql default, which at last look, were
+localhost with no authentication.
 
 Usage
 -----
@@ -53,6 +87,9 @@ Just include `mosql` in your node's `run_list`:
 }
 ```
 
+MoSQL will be started as a service upon provision and each system start using
+runit.  The log can be viewed at `/var/log/mosql/current`.
+
 Contributing
 ------------
 
@@ -67,3 +104,7 @@ License
 -------
 
 Licensed under the MIT licence, see [LICENSE](LICENSE).
+
+[mosql]: http://github.com/stripe/mosql 
+[runit]: http://community.opscode.com/cookbooks/runit
+[mosql collections YAML]: http://github.com/stripe/mosql#the-collection-map-file

@@ -7,6 +7,8 @@
 # Licensed under MIT; see LICENSE 
 #
 
+include_recipe 'runit::default'
+
 require 'yaml'
 
 # temporarily install gem from rt fork
@@ -34,19 +36,11 @@ template "#{node[:mosql][:collections_path]}" do
   variables database: node[:mosql][:mongo_database], collections: node[:mosql][:collections] 
 end
 
-# TODO: use runnit to start service
-# directory File.dirname( node[:mosql][:log_path] ) do
-#   action :create
-# end
-# 
-# file node[:mosql][:log_path] do
-#   action :create_if_missing
-# end
-# 
-# collection_flag = "-c #{node['mosql']['collections_path']}"
-# mosql_flag = node['mosql']['mongo'].nil? ? '' : "--mongo #{node['mosql']['mongo']}"
-# sql_flag = node['mosql']['sql'].nil? ? '' : "--sql #{node['mosql']['sql']}"
-# service 'mosql' do
-#   start_command "mosql #{collection_flag} #{mosql_flag} #{sql_flag}" 
-#   action [:enable, :start]
-# end
+runit_service 'mosql' do
+  options({
+    collection_flag: "-c #{node['mosql']['collections_path']}",
+    mosql_flag: node['mosql']['mongo'].nil? ? '' : "--mongo #{node['mosql']['mongo']}",
+    sql_flag: node['mosql']['sql'].nil? ? '' : "--sql #{node['mosql']['sql']}"
+  })
+  default_logger true
+end
