@@ -61,21 +61,20 @@ location is `/usr/local/etc/mosql/collections.yml`).
 The URL to connect to mongo; can be prepended with ```USERNAME@PASSWORD``` and
 postpended with options; e.g. ```mongdb://$USER@$PASSWORD:$HOST/admin```
 
-Defaults to `nil`; this uses the mosql defaults, which at last look, were
+Defaults to `nil`; this uses the mosql defaults, which at last look, was
 localhost with no authentication or options.
 
 ##### `node['mosql']['sql']` (optional)
 
 The URL to connect to the postgres database. E.g. ```postgres://sql-server/sql-db```
 
-Defaults to `nil`; this uses the mosql default, which at last look, were
+Defaults to `nil`; this uses the mosql default, which at last look, was
 localhost with no authentication.
 
 Usage
 -----
 #### mosql::default
 
-e.g.
 Just include `mosql` in your node's `run_list`:
 
 ```json
